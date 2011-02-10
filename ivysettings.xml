@@ -1,0 +1,12 @@
+<ivysettings>
+  <settings defaultResolver="default" defaultConfictManager="all"/>
+  <resolvers>
+    <chain name="default">
+      <ibiblio name="neo4j" m2compatible="true" root="http://m2.neo4j.org/snapshots"/>
+      <ibiblio name="sonatype" m2compatible="true" root="https://oss.sonatype.org/content/repositories/releases"/>
+      <ibiblio name="maven-central" m2compatible="true" root="http://repo1.maven.org/maven2"/>
+      <ibiblio name="jboss" m2compatible="true" root="http://repository.jboss.org/maven2"/>
+      <ibiblio name="jboss-brew" m2compatible="true" root="http://repository.jboss.org/maven2-brew"/>
+    </chain>
+  </resolvers>
+</ivysettings>

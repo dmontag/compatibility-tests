@@ -1,0 +1,9 @@
+<ivy-module version="2.0">
+
+  <info organisation="org.neo4j" module="compatibility-tests" />
+
+  <dependencies>
+    <dependency org="org.neo4j" name="neo4j" rev="${neo4j.version}" />
+  </dependencies>
+
+</ivy-module>
