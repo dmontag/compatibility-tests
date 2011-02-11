@@ -40,7 +40,23 @@ public class AgentManager
         {
             StoreAgent agent = agentEntry.getValue();
             String agentName = agentEntry.getKey();
-            agent.verify( new File( versionDir, agentName ).getAbsolutePath() );
+            File storePath = new File( versionDir, agentName );
+            if ( storePath.exists() )
+            {
+                try
+                {
+                    agent.verify( storePath.getAbsolutePath() );
+                }
+                catch ( Exception e )
+                {
+                    System.out.println( String.format( "Failed to verify version: %s with agent: %s", versionDir, agentName ) );
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+            else
+            {
+                System.out.println( String.format( "Version [%s] missing store for agent [%s]", versionDir, agentName ) );
+            }
         }
     }
 }

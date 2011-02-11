@@ -8,6 +8,7 @@
 
   <dependencies>
     <dependency org="org.neo4j" name="neo4j" rev="${neo4j.version}" conf="default" />
+    <dependency org="junit" name="junit" rev="4.8.1" conf="default" />
   </dependencies>
 
 </ivy-module>
