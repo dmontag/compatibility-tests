@@ -1,18 +1,11 @@
-<project name="compatibility-tests" xmlns:ivy="antlib:org.apache.ivy.ant">
-         <!--xmlns:artifact="antlib:org.apache.maven.artifact.ant">-->
+<project name="compatibility-tests" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
-  <!--<path id="maven-ant-tasks.classpath" path="/Users/david/dev/resources/libs/maven-ant-tasks-2.1.1.jar" />-->
-  <!--<typedef resource="org/apache/maven/artifact/ant/antlib.xml"-->
-           <!--uri="antlib:org.apache.maven.artifact.ant"-->
-           <!--classpathref="maven-ant-tasks.classpath" />-->
+  <path id="maven-ant-tasks.classpath" path="${basedir}/boot-lib/maven-ant-tasks-2.1.1.jar"/>
+  <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+           uri="antlib:org.apache.maven.artifact.ant"
+           classpathref="maven-ant-tasks.classpath"/>
 
-  <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant">
-    <classpath>
-      <fileset dir="/Users/david/dev/resources/libs/ivy/apache-ivy-2.2.0-rc1" includes="*.jar"/>
-    </classpath>
-  </taskdef>
-
-  <property name="dev.version" value="1.3-SNAPSHOT" />
+  <property name="dev.version" value="1.3-SNAPSHOT"/>
 
   <target name="clean" depends="init">
     <delete dir="${build.dir}"/>
@@ -20,26 +13,23 @@
   </target>
 
   <target name="init">
-    <fail unless="neo4j.version" message="Neo4j version not set: neo4j.version" />
+    <fail unless="neo4j.version" message="Neo4j version not set: neo4j.version"/>
     <property name="build.dir" value="${basedir}/build"/>
     <property name="lib.dir" value="${basedir}/lib"/>
-    <property name="src.dir" value="${basedir}/src" />
+    <property name="src.dir" value="${basedir}/src"/>
     <property name="src.framework.dir" value="${src.dir}/framework"/>
 
     <condition property="src.version" value="${neo4j.version}">
-      <available file="${src.dir}/versions/${neo4j.version}" type="dir" />
+      <available file="${src.dir}/versions/${neo4j.version}" type="dir"/>
     </condition>
-    <property name="src.version" value="default" />
+    <property name="src.version" value="default"/>
 
     <property name="src.version.dir" value="${src.dir}/versions/${src.version}"/>
     <property name="db.versions.top.dir" value="${build.dir}/db"/>
     <property name="db.version.dir" value="${db.versions.top.dir}/${neo4j.version}"/>
     <property name="classes.dir" value="${build.dir}/classes"/>
-    <property name="ivy.retrieve.pattern" value="${lib.dir}/[module]-[artifact]-[revision]-[conf].[ext]"/>
-    <property name="ivy.file" value="${basedir}/neo4j-ivy.xml"/>
     <property name="repo.dir" value="repo"/>
     <mkdir dir="${repo.dir}"/>
-    <ivy:configure file="${basedir}/ivysettings.xml"/>
 
     <path id="classpath">
       <fileset dir="${lib.dir}">
@@ -50,28 +40,33 @@
 
   </target>
 
-  <target name="resolve-dependencies" depends="init">
-    <ivy:resolve file="${ivy.file}" haltonfailure="false" failureproperty="ivy.resolve.failed" conf="default"/>
-    <ivy:report todir="${build.dir}/ivy-report"/>
-    <fail if="ivy.resolve.failed"/>
-  </target>
-
-  <target name="retrieve-dependencies" depends="resolve-dependencies">
-    <ivy:retrieve file="${ivy.file}" pattern="${ivy.retrieve.pattern}" conf="default"/>
+  <target name="retrieve-dependencies">
+    <artifact:dependencies filesetid="mvn.libs">
+      <remoterepository id="neo4j" url="http://m2.neo4j.org/snapshots"/>
+      <remoterepository id="sonatype" url="https://oss.sonatype.org/content/repositories/releases"/>
+      <remoterepository id="maven-central" url="http://repo1.maven.org/maven2"/>
+      <remoterepository id="jboss" url="http://repository.jboss.org/maven2"/>
+      <remoterepository id="jboss-brew" url="http://repository.jboss.org/maven2-brew"/>
+      <dependency groupId="org.neo4j" artifactId="neo4j" version="${neo4j.version}" scope="compile"/>
+      <dependency groupId="junit" artifactId="junit" version="4.8.1" scope="compile"/>
+    </artifact:dependencies>
+    <copy todir="${lib.dir}">
+      <fileset refid="mvn.libs"/>
+    </copy>
   </target>
 
   <target name="compile" depends="init">
-    <echo message="Using framework src dir: ${src.framework.dir}" />
-    <echo message="Using version src dir: ${src.version.dir}" />
+    <echo message="Using framework src dir: ${src.framework.dir}"/>
+    <echo message="Using version src dir: ${src.version.dir}"/>
     <mkdir dir="${classes.dir}"/>
-    <javac debug="true" classpathref="classpath" srcdir="${src.framework.dir}" destdir="${classes.dir}" />
+    <javac debug="true" classpathref="classpath" srcdir="${src.framework.dir}" destdir="${classes.dir}"/>
     <javac debug="true" classpathref="classpath" srcdir="${src.version.dir}" destdir="${classes.dir}"/>
     <copy todir="${classes.dir}">
       <fileset dir="${src.framework.dir}">
-        <include name="**/*" />
+        <include name="**/*"/>
       </fileset>
       <fileset dir="${src.version.dir}">
-        <include name="**/*" />
+        <include name="**/*"/>
       </fileset>
     </copy>
   </target>
@@ -82,17 +77,22 @@
   <target name="dev-setup">
     <property name="neo4j.version" value="${dev.version}"/>
     <property name="lib.dir" value="${basedir}/dev-lib"/>
-    <delete dir="${lib.dir}" />
+    <delete dir="${lib.dir}"/>
   </target>
 
   <target name="retrieve-dev-dependencies" depends="dev-setup,init,retrieve-dependencies"
-          description="Retrieves the dependencies based on the dev.version property."/>
+          description="Retrieves the dependencies based on the dev.version property.">
+
+    <copy todir="${lib.dir}" flatten="true">
+      <fileset dir="${lib.dir}" includes="**/*.jar" />
+    </copy>
+  </target>
 
 
   <!-- Generate -->
 
   <target name="generate-test-graph" depends="init,clean,retrieve-dependencies,compile">
-    <mkdir dir="${db.version.dir}" />
+    <mkdir dir="${db.version.dir}"/>
     <java classpathref="classpath" classname="org.neo4j.compatibility.Generate" failonerror="true">
       <sysproperty key="version.dir" value="${db.version.dir}"/>
     </java>
@@ -114,7 +114,7 @@
 
   <target name="verify-build" depends="init,clean,retrieve-dependencies,compile,unpack-stores">
     <dirset id="versions.csv" dir="${db.versions.top.dir}" includes="*"/>
-    <pathconvert dirsep="/" pathsep="," property="versions.csv" refid="versions.csv" />
+    <pathconvert dirsep="/" pathsep="," property="versions.csv" refid="versions.csv"/>
     <java classpathref="classpath" classname="org.neo4j.compatibility.Verify" failonerror="true">
       <sysproperty key="versions.csv" value="${versions.csv}"/>
     </java>
