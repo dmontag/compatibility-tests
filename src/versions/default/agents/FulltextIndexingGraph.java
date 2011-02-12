@@ -15,7 +15,7 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class FulltextIndexingGraph extends DefaultStoreAgent
+public class FulltextIndexingGraph implements StoreAgent
 {
     private static final RelationshipType REL_TYPE = DynamicRelationshipType.withName( "REL" );
 

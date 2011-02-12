@@ -119,7 +119,7 @@
 
   <target name="generate-test-graph" depends="init,clean,retrieve-dependencies,compile">
     <mkdir dir="${db.version.dir}"/>
-    <java classpathref="classpath" classname="org.neo4j.compatibility.Generate" failonerror="true">
+    <java fork="true" classpathref="classpath" classname="org.neo4j.compatibility.Generate" failonerror="true">
       <sysproperty key="version.dir" value="${db.version.dir}"/>
     </java>
     <property name="version.zip.file" value="${build.dir}/db-${neo4j.version}.zip"/>
@@ -141,10 +141,7 @@
   <target name="verify-build" depends="init,clean,retrieve-dependencies,compile,unpack-stores">
     <dirset id="versions.csv" dir="${db.versions.top.dir}" includes="*"/>
     <pathconvert dirsep="/" pathsep="," property="versions.csv" refid="versions.csv"/>
-    <java classpathref="classpath" classname="org.neo4j.compatibility.Verify" failonerror="true">
-      <permissions>
-        <grant class="java.security.AllPermission"/>
-      </permissions>
+    <java fork="true" classpathref="classpath" classname="org.neo4j.compatibility.Verify" failonerror="true">
       <sysproperty key="versions.csv" value="${versions.csv}"/>
     </java>
   </target>

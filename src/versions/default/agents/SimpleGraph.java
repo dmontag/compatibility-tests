@@ -16,7 +16,7 @@ import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
 
-public class SimpleGraph extends DefaultStoreAgent
+public class SimpleGraph implements StoreAgent
 {
     private static final RelationshipType REL_TYPE = DynamicRelationshipType.withName( "REL" );
 
@@ -43,7 +43,7 @@ public class SimpleGraph extends DefaultStoreAgent
         Node n = graphDb.getNodeById( 1 );
         Node n2 = n.getSingleRelationship( REL_TYPE, Direction.OUTGOING ).getEndNode();
         assertEquals( new HashSet<Node>( Arrays.asList( graphDb.getReferenceNode(), n, n2 ) ),
-            new HashSet<Node>( IteratorUtil.asCollection( graphDb.getAllNodes() ) ) );
+            IteratorUtil.addToCollection( graphDb.getAllNodes(), new HashSet<Node>() ) );
         graphDb.shutdown();
     }
 }

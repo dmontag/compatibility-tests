@@ -13,7 +13,7 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 import static org.junit.Assert.assertEquals;
 
-public class SimpleIndexingGraph extends DefaultStoreAgent
+public class SimpleIndexingGraph implements StoreAgent
 {
     private static final RelationshipType REL_TYPE = DynamicRelationshipType.withName( "REL" );
 
