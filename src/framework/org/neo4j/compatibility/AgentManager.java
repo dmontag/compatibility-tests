@@ -20,8 +20,15 @@ public class AgentManager
     {
         for ( StoreAgent storeAgent : ServiceLoader.load( StoreAgent.class ) )
         {
-            System.out.println( "Found agent: " + storeAgent.getClass().getName() );
-            agents.put( storeAgent.getClass().getSimpleName(), storeAgent );
+            if (storeAgent instanceof IgnoringStoreAgent)
+            {
+                System.out.println( "Ignored agent: " + storeAgent.getClass().getName() );
+            }
+            else
+            {
+                System.out.println( "Found agent: " + storeAgent.getClass().getName() );
+                agents.put( storeAgent.getClass().getSimpleName(), storeAgent );
+            }
         }
         System.out.println( "Loaded all agents." );
     }

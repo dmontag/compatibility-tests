@@ -43,7 +43,7 @@
   </target>
 
   <target name="retrieve-dependencies">
-    <artifact:dependencies filesetid="mvn.libs">
+    <artifact:dependencies filesetid="mvn.libs" sourcesfilesetid="mvn.sources">
       <remoterepository id="neo4j" url="http://m2.neo4j.org/snapshots"/>
       <remoterepository id="sonatype" url="https://oss.sonatype.org/content/repositories/releases"/>
       <remoterepository id="maven-central" url="http://repo1.maven.org/maven2"/>
@@ -54,6 +54,9 @@
     </artifact:dependencies>
     <copy todir="${lib.dir}">
       <fileset refid="mvn.libs"/>
+    </copy>
+    <copy todir="${lib.dir}">
+      <fileset refid="mvn.sources"/>
     </copy>
   </target>
 
@@ -139,6 +142,9 @@
     <dirset id="versions.csv" dir="${db.versions.top.dir}" includes="*"/>
     <pathconvert dirsep="/" pathsep="," property="versions.csv" refid="versions.csv"/>
     <java classpathref="classpath" classname="org.neo4j.compatibility.Verify" failonerror="true">
+      <permissions>
+        <grant class="java.security.AllPermission"/>
+      </permissions>
       <sysproperty key="versions.csv" value="${versions.csv}"/>
     </java>
   </target>

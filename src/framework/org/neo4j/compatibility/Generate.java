@@ -14,7 +14,9 @@ public class Generate
     private void run()
     {
         File versionDir = new File( System.getProperty( "version.dir" ) );
+        System.out.println( "====================================================" );
         System.out.println( "Generating version: " + versionDir );
+        System.out.println( "====================================================" );
         agentManager.generate( versionDir );
     }
 
