@@ -2,3 +2,4 @@ agents.SimpleGraph
 agents.SimpleIndexingGraph
 agents.UnclosedIndexingGraph
 agents.FulltextIndexingGraph
+agents.ExhaustiveGraph

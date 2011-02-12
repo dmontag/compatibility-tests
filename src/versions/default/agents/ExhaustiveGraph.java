@@ -72,10 +72,10 @@ public class ExhaustiveGraph implements StoreAgent
         }
         assertEquals( new HashSet<Node>( Arrays.asList( personB, personC, personD ) ), actual );
 
-        assertEquals( personA, personB.getSingleRelationship( WORKS_FOR, Direction.INCOMING ) );
-        assertEquals( personC, personB.getSingleRelationship( WORKS_FOR, Direction.OUTGOING ) );
+        assertEquals( personA, personB.getSingleRelationship( WORKS_FOR, Direction.INCOMING ).getStartNode() );
+        assertEquals( personC, personB.getSingleRelationship( WORKS_FOR, Direction.OUTGOING ).getEndNode() );
 
-        assertEquals( personD, personC.getSingleRelationship( WORKS_FOR, Direction.OUTGOING ) );
-        assertEquals( personC, personD.getSingleRelationship( WORKS_FOR, Direction.INCOMING ) );
+        assertEquals( personD, personC.getSingleRelationship( WORKS_FOR, Direction.OUTGOING ).getEndNode() );
+        assertEquals( personC, personD.getSingleRelationship( WORKS_FOR, Direction.INCOMING ).getStartNode() );
     }
 }

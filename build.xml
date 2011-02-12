@@ -73,13 +73,13 @@
     </condition>
   </target>
 
-  <target name="compile-default" depends="check-should-copy-default" if="should.copy.default">
+  <target name="copy-default" depends="check-should-copy-default" if="should.copy.default">
     <copy todir="${src.effective.dir}">
       <fileset dir="${src.default.dir}" includes="**/*"/>
     </copy>
   </target>
 
-  <target name="compile-version" depends="compile-default">
+  <target name="compile-version" depends="copy-default">
     <copy todir="${src.effective.dir}" overwrite="true">
       <fileset dir="${src.version.dir}" includes="**/*"/>
     </copy>
