@@ -1,11 +1,10 @@
-package v12M01.agents;
+package agents;
 
 import org.neo4j.compatibility.StoreAgent;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.IteratorUtil;
@@ -16,7 +15,7 @@ import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
 
-public class UnclosedGraph implements StoreAgent
+public class SimpleGraph implements StoreAgent
 {
     private static final RelationshipType REL_TYPE = DynamicRelationshipType.withName( "REL" );
 
@@ -27,23 +26,21 @@ public class UnclosedGraph implements StoreAgent
         try
         {
             Node n = graphDb.createNode();
-            Node n2 = graphDb.createNode();
-            Relationship rel = n.createRelationshipTo( n2, REL_TYPE );
-
+            n.createRelationshipTo( graphDb.createNode(), REL_TYPE );
             tx.success();
         }
         finally
         {
             tx.finish();
         }
+        graphDb.shutdown();
     }
 
     public void verify( String dbPath )
     {
         GraphDatabaseService graphDb = new EmbeddedGraphDatabase( dbPath );
         Node n = graphDb.getNodeById( 1 );
-        Relationship rel = n.getSingleRelationship( REL_TYPE, Direction.OUTGOING );
-        Node n2 = rel.getEndNode();
+        Node n2 = n.getSingleRelationship( REL_TYPE, Direction.OUTGOING ).getEndNode();
         assertEquals( new HashSet<Node>( Arrays.asList( graphDb.getReferenceNode(), n, n2 ) ),
             IteratorUtil.addToCollection( graphDb.getAllNodes(), new HashSet<Node>() ) );
         graphDb.shutdown();

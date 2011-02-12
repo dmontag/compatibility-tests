@@ -1,4 +1,4 @@
-package latest.agents;
+package agents;
 
 import org.neo4j.compatibility.StoreAgent;
 import org.neo4j.graphdb.Direction;

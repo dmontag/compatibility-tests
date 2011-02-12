@@ -1,14 +1,17 @@
 package org.neo4j.compatibility;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.ServiceLoader;
 
-public class Verify {
+public class Verify
+{
 
-    private AgentManager agentManager = new AgentManager();
-    Map<String, Exception> errors = new HashMap<String, Exception>();
+    private AgentManager agentManager;
+
+    public Verify( ErrorReporter errorReporter )
+    {
+        agentManager = new AgentManager( errorReporter );
+    }
 
     private void run()
     {
@@ -21,35 +24,16 @@ public class Verify {
 
     private void verifyVersion( String versionDir )
     {
-        try
-        {
-            agentManager.verify( new File( versionDir ) );
-        }
-        catch ( Exception e )
-        {
-            errors.put( versionDir, e );
-        }
-    }
-
-    private int exit()
-    {
-        if (errors.size() > 0)
-        {
-            for ( Map.Entry<String, Exception> errorEntry : errors.entrySet() )
-            {
-                System.out.println( String.format( "Verification of [%s] encountered an error:", errorEntry.getKey() ) );
-                errorEntry.getValue().printStackTrace( System.out );
-            }
-            return 1;
-        }
-        return 0;
+        agentManager.verify( new File( versionDir ) );
     }
 
     public static void main( String[] args )
     {
-        Verify verify = new Verify();
+        ErrorReporter errorReporter = new ErrorReporter();
+        Verify verify = new Verify( errorReporter );
         verify.run();
-        System.exit( verify.exit() );
+        errorReporter.printReport();
+        System.exit( errorReporter.hasErrors() ? 1 : 0 );
     }
 
 }

@@ -6,19 +6,24 @@ public class Generate
 {
     private AgentManager agentManager;
 
-    public Generate()
+    public Generate( ErrorReporter errorReporter )
     {
-        agentManager = new AgentManager();
+        agentManager = new AgentManager( errorReporter );
     }
 
     private void run()
     {
-        agentManager.generate( new File( System.getProperty( "version.dir" ) ) );
+        File versionDir = new File( System.getProperty( "version.dir" ) );
+        System.out.println( "Generating version: " + versionDir );
+        agentManager.generate( versionDir );
     }
 
     public static void main( String[] args )
     {
-        new Generate().run();
+        ErrorReporter errorReporter = new ErrorReporter();
+        new Generate( errorReporter ).run();
+        errorReporter.printReport();
+        System.exit( errorReporter.hasErrors() ? 1 : 0 );
     }
 
 }

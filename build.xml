@@ -16,14 +16,14 @@
     <fail unless="neo4j.version" message="Neo4j version not set: neo4j.version"/>
     <property name="build.dir" value="${basedir}/build"/>
     <property name="lib.dir" value="${basedir}/lib"/>
+    <property name="src.effective.dir" value="${build.dir}/src"/>
     <property name="src.dir" value="${basedir}/src"/>
-    <property name="src.framework.dir" value="${src.dir}/framework"/>
 
-    <condition property="src.version" value="${neo4j.version}">
+    <condition property="src.version" value="${neo4j.version}" else="default">
       <available file="${src.dir}/versions/${neo4j.version}" type="dir"/>
     </condition>
-    <property name="src.version" value="default"/>
-
+    <property name="src.framework.dir" value="${src.dir}/framework"/>
+    <property name="src.default.dir" value="${src.dir}/versions/default"/>
     <property name="src.version.dir" value="${src.dir}/versions/${src.version}"/>
     <property name="db.versions.top.dir" value="${build.dir}/db"/>
     <property name="db.version.dir" value="${db.versions.top.dir}/${neo4j.version}"/>
@@ -38,6 +38,8 @@
       <pathelement path="${classes.dir}"/>
     </path>
 
+    <echo message="Using framework src dir: ${src.framework.dir}"/>
+    <echo message="Using version src dir: ${src.version.dir}"/>
   </target>
 
   <target name="retrieve-dependencies">
@@ -47,7 +49,7 @@
       <remoterepository id="maven-central" url="http://repo1.maven.org/maven2"/>
       <remoterepository id="jboss" url="http://repository.jboss.org/maven2"/>
       <remoterepository id="jboss-brew" url="http://repository.jboss.org/maven2-brew"/>
-      <dependency groupId="org.neo4j" artifactId="neo4j" version="${neo4j.version}" scope="compile"/>
+      <dependency groupId="org.neo4j" type="pom" artifactId="neo4j" version="${neo4j.version}" scope="compile"/>
       <dependency groupId="junit" artifactId="junit" version="4.8.1" scope="compile"/>
     </artifact:dependencies>
     <copy todir="${lib.dir}">
@@ -55,20 +57,41 @@
     </copy>
   </target>
 
-  <target name="compile" depends="init">
-    <echo message="Using framework src dir: ${src.framework.dir}"/>
-    <echo message="Using version src dir: ${src.version.dir}"/>
+  <target name="compile-framework">
     <mkdir dir="${classes.dir}"/>
     <javac debug="true" classpathref="classpath" srcdir="${src.framework.dir}" destdir="${classes.dir}"/>
-    <javac debug="true" classpathref="classpath" srcdir="${src.version.dir}" destdir="${classes.dir}"/>
+  </target>
+
+  <target name="check-should-copy-default">
+    <condition property="should.copy.default">
+      <not>
+        <available file="${src.version.dir}/no-default" />
+      </not>
+    </condition>
+  </target>
+
+  <target name="compile-default" depends="check-should-copy-default" if="should.copy.default">
+    <copy todir="${src.effective.dir}">
+      <fileset dir="${src.default.dir}" includes="**/*"/>
+    </copy>
+  </target>
+
+  <target name="compile-version" depends="compile-default">
+    <copy todir="${src.effective.dir}" overwrite="true">
+      <fileset dir="${src.version.dir}" includes="**/*"/>
+    </copy>
+    <javac debug="true" classpathref="classpath" srcdir="${src.effective.dir}" destdir="${classes.dir}"/>
     <copy todir="${classes.dir}">
       <fileset dir="${src.framework.dir}">
         <include name="**/*"/>
       </fileset>
-      <fileset dir="${src.version.dir}">
+      <fileset dir="${src.effective.dir}">
         <include name="**/*"/>
       </fileset>
     </copy>
+  </target>
+
+  <target name="compile" depends="init,compile-framework,compile-version">
   </target>
 
 
@@ -84,7 +107,7 @@
           description="Retrieves the dependencies based on the dev.version property.">
 
     <copy todir="${lib.dir}" flatten="true">
-      <fileset dir="${lib.dir}" includes="**/*.jar" />
+      <fileset dir="${lib.dir}" includes="**/*.jar"/>
     </copy>
   </target>
 

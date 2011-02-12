@@ -8,9 +8,11 @@ import java.util.ServiceLoader;
 public class AgentManager
 {
     private Map<String, StoreAgent> agents = new HashMap<String, StoreAgent>();
+    private ErrorReporter errorReporter;
 
-    public AgentManager()
+    public AgentManager( ErrorReporter errorReporter )
     {
+        this.errorReporter = errorReporter;
         loadVerifiers();
     }
 
@@ -26,16 +28,28 @@ public class AgentManager
 
     public void generate( File versionDir )
     {
+        Report report = errorReporter.versionReport( versionDir );
         for ( Map.Entry<String, StoreAgent> agentEntry : agents.entrySet() )
         {
             StoreAgent agent = agentEntry.getValue();
             String agentName = agentEntry.getKey();
-            agent.generate( new File( versionDir, agentName ).getAbsolutePath() );
+            try
+            {
+                agent.generate( new File( versionDir, agentName ).getAbsolutePath() );
+            }
+            catch ( Throwable e )
+            {
+                report.reportException( e, "Failed to generate version [%s] with agent [%s]", versionDir, agentName );
+            }
         }
     }
 
     public void verify( File versionDir )
     {
+        System.out.println( "====================================================" );
+        System.out.println( "Verifying version: " + versionDir );
+        System.out.println( "====================================================" );
+        Report report = errorReporter.versionReport( versionDir );
         for ( Map.Entry<String, StoreAgent> agentEntry : agents.entrySet() )
         {
             StoreAgent agent = agentEntry.getValue();
@@ -46,16 +60,16 @@ public class AgentManager
                 try
                 {
                     agent.verify( storePath.getAbsolutePath() );
+                    report.info( "Verified version [%s] with agent [%s]", versionDir, agentName );
                 }
-                catch ( Exception e )
+                catch ( Throwable e )
                 {
-                    System.out.println( String.format( "Failed to verify version: %s with agent: %s", versionDir, agentName ) );
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    report.reportException( e, "Failed to verify version [%s] with agent [%s]", versionDir, agentName );
                 }
             }
             else
             {
-                System.out.println( String.format( "Version [%s] missing store for agent [%s]", versionDir, agentName ) );
+                report.info( "Version [%s] missing store for agent [%s]", versionDir, agentName );
             }
         }
     }

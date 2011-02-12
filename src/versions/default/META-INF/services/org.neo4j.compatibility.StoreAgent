@@ -1,3 +1,4 @@
-latest.agents.SimpleGraph
-latest.agents.SimpleIndexingGraph
-latest.agents.UnclosedIndexingGraph
+agents.SimpleGraph
+agents.SimpleIndexingGraph
+agents.UnclosedIndexingGraph
+agents.FulltextIndexingGraph
