@@ -50,8 +50,8 @@ public class UnclosedIndexingGraph implements StoreAgent
         Node n = nodeIndex.get( "name", "a" ).getSingle();
         Node n2 = nodeIndex.get( "name", "b" ).getSingle();
         Relationship rel = relationshipIndex.get( "name", "a" ).getSingle();
-        assertEquals( n, rel.getStartNode() );
-        assertEquals( n2, rel.getEndNode() );
+        assertEquals( "Wrong start node on relationship.", n, rel.getStartNode() );
+        assertEquals( "Wrong end node on relationship.", n2, rel.getEndNode() );
 
         graphDb.shutdown();
     }

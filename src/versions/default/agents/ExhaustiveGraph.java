@@ -77,5 +77,7 @@ public class ExhaustiveGraph implements StoreAgent
 
         assertEquals( personD, personC.getSingleRelationship( WORKS_FOR, Direction.OUTGOING ).getEndNode() );
         assertEquals( personC, personD.getSingleRelationship( WORKS_FOR, Direction.INCOMING ).getStartNode() );
+
+        graphDb.shutdown();
     }
 }
