@@ -4,3 +4,4 @@ agents.UnclosedIndexingGraph
 agents.FulltextIndexingGraph
 agents.ExhaustiveGraph
 agents.UnfinishedTransactionGraph
+agents.UnclosedGraph
