@@ -100,7 +100,17 @@ The default behavior should be to add new tests to src/versions/default.
 Simply give your class a unique name (that identifies the test store), and
 make your class implement StoreAgent. Finally, add your class name to
 src/versions/default/META-INF/services/org.neo4j.compatibility.StoreAgent. It
-will then be picked up when generating and verifying test stores. 
+will then be picked up when generating and verifying test stores.
+
+To make development a little bit easier, one can set the dev.version property
+in build.xml, and run:
+
+  ant retrieve-dev-dependencies
+
+It will place the necessary libraries in the dev-lib/ directory. These can
+then be included by the IDE. For example, if going back to change a
+version-specific agent for 1.2.M01, then dev.version can be set to 1.2.M01,
+and the change can be made by using src/versions/1.2.M01 as source root.
 
 
 Managing code incompatibility
